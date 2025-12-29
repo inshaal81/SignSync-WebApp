@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSync - ASL Classification</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="../static/script.js" defer></script>
+</head>
+<body>
+    <div class="header">SignSync
+        <button class="docsBtn">How It Works?</button>
+    </div>  
+
+    <div class="topContent">
+        <div class="aboutSection">About SignSync
+            <div class="text1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates, dolorum.
+                Necessitatibus facilis quisquam saepe, cum, nemo ipsam blanditiis rerum 
+                perspiciatis magnam inventore eaque accusamus in!
+            </div>
+        </div>
+        
+        <div class="uploadImg">
+            <div id="uploader">
+                <div id="videoPlaceholder" class="placeholder">
+                    <div class="placeholderContent">
+                        <div class="placeholderIcon">📹</div>
+
+                        <div class="placeholderText">Your Webcam Will Appear Here!</div>
+                    </div>
+                </div>
+
+                <video id="videoElement" autoplay playsinline style="display:none;"></video>
+
+                <canvas id="canvasElement" style="display:none;"></canvas>
+
+                <div class="imgNav">
+                    <button onclick="startWebcam()">Start Webcam</button>
+                    <button onclick="takeSnapshot()">Take Snapshot</button>
+                    <button onclick="stopWebcam()">Stop Webcam</button>
+                </div>
+            </div>
+            
+            <div class="uploadInstr">How To Upload An Image:
+                <div class="text2">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet tempora 
+                    maxime aliquid hic, cum repudiandae itaque ad aliquam vero, illo odio 
+                    laborum id excepturi sint?
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottomContent">
+        <div id="imagePlaceholder" class="placeholder">
+            <div class="placeholderContent">
+                <div class="placeholderIcon">🖼️</div>
+
+                <div class="placeholderText">Your Image will Appear Here!</div>
+            </div>
+        </div>
+
+        <img id="capturedImage" src="" style="display:none;">
+
+        <div class="arrow">&rarr;</div>
+        
+        <div class="result"></div>
+    </div>
+
+    <div class="footer">theChosen-1 @ Github</div>
+</body>
+</html>

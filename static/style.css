@@ -1,0 +1,210 @@
+:root {
+    --bg: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --lightgray: #c9cbd1;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 125vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgb(236, 236, 236);
+}
+
+/* hide page scrollbar */
+html { scrollbar-width: none; } /* Firefox */
+body { -ms-overflow-style: none; } /* IE and Edge */
+body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; } /* Chrome */
+/* end hide page scrollbar */
+
+/* header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+    position: sticky;
+    font-size: 42px;
+    font-weight: bolder;
+    color: var(--text);
+    padding: 12px;
+    background: var(--bg);
+    border-bottom: 2px solid var(--muted);
+}
+
+.docsBtn {
+    display: flex;
+    width: fit-content;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid var(--text);
+    border-radius: 999px;
+    background-color: whitesmoke;
+    padding:8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.docsBtn:hover, .imgNav button:hover {
+  background: var(--bg);
+  transform: translateY(-4px);
+}
+
+/* top-content */
+.topContent {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 150px;
+    padding-right: 150px;
+    padding-bottom: 150px;
+    border-bottom: 2px solid var(--muted);
+}
+
+.uploadImg {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--muted);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+
+#uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.imgNav {
+    display: flex;
+    margin: 12px;
+    gap: 12px;
+}
+
+.imgNav button {
+    display: flex;
+    width: fit-content;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid var(--text);
+    border-radius: 999px;
+    background-color: whitesmoke;
+    padding:8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#videoElement, #canvasElement {
+    display: flex;
+    max-width: 350px;
+    max-height: 350px;
+    border-radius: 12px;
+}
+
+/* placeholders */
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    border: 2px dashed var(--muted);
+    border-radius: 12px;
+    background-color: var(--lightgray);
+    opacity: 0.6;
+}
+
+#videoPlaceholder {
+    min-width: 350px;
+    min-height: 262.5px;
+}
+
+#imagePlaceholder {
+    min-width: 250px;
+    min-height: 187.5px;
+}
+
+.placeholderContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.placeholderIcon {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.placeholderText {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+    text-align: center;
+}
+
+/* card widths */
+.aboutSection, .uploadImg {
+    max-width: 600px;
+}
+
+.aboutSection, .uploadInstr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 550px;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text);
+    padding: 15px;
+    border: 2px solid var(--muted);
+    border-radius: 8px;
+    background-color: var(--bg);
+
+}
+
+.text1, .text2 {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 300;
+    padding-top: 8px;
+}
+
+/* bottom-content */
+.bottomContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-left: 150px;
+    margin-right: 150px;
+    background-color: var(--bg);
+    border: 2px solid var(--text);
+    border-radius: 12px;
+}
+
+#capturedImage {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 12px;
+}
+/* footer */
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: static;
+    border-top: 2px solid var(--muted);
+    color: var(--text);
+    background-color: lightgrey;
+    padding: 25px;
+}
