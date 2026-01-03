@@ -3,6 +3,7 @@ const canvas = document.querySelector('#canvasElement');
 const capturedImage = document.querySelector('#capturedImage');
 const videoPlaceholder = document.querySelector('#videoPlaceholder');
 const imagePlaceholder = document.querySelector('#imagePlaceholder');
+const resultDiv = document.querySelector('.result');
 const context = canvas.getContext('2d');
 let webcamStream = null;
 
@@ -49,16 +50,67 @@ function takeSnapshot() {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
         // Convert the canvas content to a data URL (base64 image)
-        const imageDataUrl = canvas.toDataURL('image/jpeg'); // or 'image/png'
+        const imageDataUrl = canvas.toDataURL('image/jpeg');
         
         // Display the captured image and hide placeholder
         capturedImage.src = imageDataUrl;
         imagePlaceholder.style.display = 'none';
         capturedImage.style.display = 'flex';
 
-        // The imageDataUrl can then be sent to a server if needed
-        console.log("Captured image data URL:", imageDataUrl.substring(0, 50) + "...");
+        // Send image to Flask backend for classification
+        sendImageForClassification(imageDataUrl);
     } else {
         alert("Webcam not started.");
+    }
+}
+
+async function sendImageForClassification(imageDataUrl) {
+    try {
+        // Show loading state
+        resultDiv.innerHTML = '<div class="loading">Processing...</div>';
+        resultDiv.style.display = 'flex';
+        
+        // Convert data URL to Blob
+        const base64Data = imageDataUrl.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        
+        // Create FormData and append the image
+        const formData = new FormData();
+        formData.append('image', blob, 'capture.jpg');
+        
+        // Send to Flask backend
+        const classifyResponse = await fetch('/classify', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!classifyResponse.ok) {
+            const errorData = await classifyResponse.json().catch(() => ({}));
+            throw new Error(errorData.error || `Server error: ${classifyResponse.status}`);
+        }
+        
+        const result = await classifyResponse.json();
+        
+        if (result.success) {
+            // Display classification result
+            resultDiv.innerHTML = `
+                <div class="classification-result">
+                    <div class="classification-letter">${result.classification}</div>
+                    <div class="confidence">Confidence: ${(result.confidence * 100).toFixed(1)}%</div>
+                </div>
+            `;
+        } else {
+            throw new Error(result.error || 'Classification failed');
+        }
+        
+    } catch (error) {
+        console.error('Error classifying image:', error);
+        resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
     }
 }
