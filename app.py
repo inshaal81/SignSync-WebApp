@@ -54,6 +54,10 @@ def classify_asl_image(image_path):
 def index():
     return render_template('index.html')
 
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
+
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'}), 200

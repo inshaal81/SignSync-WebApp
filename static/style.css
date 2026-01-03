@@ -9,6 +9,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    overscroll-behavior: none;
 }
 
 body {
@@ -76,7 +77,6 @@ body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; } /* Ch
     border-radius: 8px;
     padding: 8px;
 }
-
 
 #uploader {
     display: flex;
