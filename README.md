@@ -1,4 +1,4 @@
-# SignSync
+# SignSync - Web App
 
 A web application for real-time American Sign Language (ASL) classification using machine learning.
 
