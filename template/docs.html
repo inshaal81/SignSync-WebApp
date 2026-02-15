@@ -3,15 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SignSync - Docs</title>
+    <meta name="description" content="Learn how SignSync works - ASL classification using machine learning">
+    <title>SignSync - How It Works</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='docStyle.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
     <div class="header">SignSync
         <button class="homeBtn" onclick="window.location.href='/'">Home</button>
-    </div>  
-    
+    </div>
+
+    <div class="docsContent">
+        <h1>How SignSync Works</h1>
+
+        <section class="docSection">
+            <h2>What is SignSync?</h2>
+            <p>
+                SignSync is a web application that uses machine learning to recognize
+                American Sign Language (ASL) hand gestures. It can identify the 26 letters
+                of the ASL alphabet from images captured via your webcam.
+            </p>
+        </section>
+
+        <section class="docSection">
+            <h2>The Technology</h2>
+            <p>
+                SignSync uses a trained neural network model to classify hand gestures.
+                When you take a snapshot, the image is sent to our server where it's
+                processed and analyzed by the model. The model returns its prediction
+                along with a confidence score indicating how certain it is about the result.
+            </p>
+        </section>
+
+        <section class="docSection">
+            <h2>Step-by-Step Process</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="stepNumber">1</div>
+                    <div class="stepContent">
+                        <h3>Capture</h3>
+                        <p>Your webcam captures an image of your hand gesture.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="stepNumber">2</div>
+                    <div class="stepContent">
+                        <h3>Process</h3>
+                        <p>The image is sent to our server and preprocessed for the model.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="stepNumber">3</div>
+                    <div class="stepContent">
+                        <h3>Classify</h3>
+                        <p>Our ML model analyzes the image and identifies the ASL letter.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="stepNumber">4</div>
+                    <div class="stepContent">
+                        <h3>Result</h3>
+                        <p>The predicted letter and confidence score are displayed to you.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="docSection">
+            <h2>Tips for Best Results</h2>
+            <ul class="tipsList">
+                <li>Use good lighting so your hand is clearly visible</li>
+                <li>Position your hand against a plain, contrasting background</li>
+                <li>Keep your hand steady when taking a snapshot</li>
+                <li>Make sure your entire hand is visible in the frame</li>
+                <li>Form letters clearly and distinctly</li>
+            </ul>
+        </section>
+
+        <section class="docSection">
+            <h2>Supported Signs</h2>
+            <p>
+                SignSync currently supports the 26 letters of the ASL alphabet (A-Z).
+                Future updates may include numbers and common words.
+            </p>
+            <div class="alphabetGrid">
+                <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+                <span>F</span><span>G</span><span>H</span><span>I</span><span>J</span>
+                <span>K</span><span>L</span><span>M</span><span>N</span><span>O</span>
+                <span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span>
+                <span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span>
+                <span>Z</span>
+            </div>
+        </section>
+    </div>
+
     <div class="footer">theChosen-1 @ Github</div>
 </body>
 </html>
