@@ -21,6 +21,7 @@ SignSync enables users to capture hand gestures via webcam and receive instant A
 - [API Endpoints](#api-endpoints)
 - [Adding Your ML Model](#adding-your-ml-model)
 - [Security Considerations](#security-considerations)
+- [Testing & CI/CD](#testing--cicd)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -129,7 +130,13 @@ SignSync-WebApp/
 |----------|-------------|----------|---------|
 | `SECRET_KEY` | Flask secret key for session security | Yes (production) | `dev-only-not-for-production` |
 | `FLASK_DEBUG` | Enable debug mode (`True`/`False`) | No | `False` |
+| `FLASK_ENV` | Environment (`development`/`production`) | No | Inferred from DEBUG |
 | `PORT` | Server port number | No | `5001` (local), `10000` (Render) |
+| `MODEL_PATH` | Path to ML model file | No | `model/signsync_model.pkl` |
+| `MODEL_TYPE` | Model type (`custom`/`sklearn`/`tensorflow`/`onnx`) | No | `custom` |
+| `MODEL_INPUT_SIZE` | Expected input image size (pixels) | No | `28` |
+| `MAX_CONTENT_LENGTH` | Max upload size in bytes | No | `16777216` (16MB) |
+| `LOG_LEVEL` | Logging level | No | `INFO` |
 
 ### Generating a SECRET_KEY
 
@@ -162,7 +169,10 @@ python -c "import secrets; print(secrets.token_hex(32))"
    Render will automatically detect `render.yaml` and configure:
    - Python 3.11 runtime
    - Build command: `pip install -r requirements.txt`
-   - Start command: `gunicorn --bind 0.0.0.0:$PORT app:app`
+   - Start command: `gunicorn --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120 app:app`
+   - Health check path: `/health`
+   - Auto-deploy on push: enabled
+   - Auto-generated `SECRET_KEY`
 
 Your app will be live at `https://signsync.onrender.com` (or your custom domain).
 
@@ -196,16 +206,26 @@ Returns the "How It Works" documentation page.
 
 ### GET `/health`
 
-Health check endpoint for monitoring.
+Health check endpoint for monitoring and deployment verification.
 
 **Response**:
 ```json
 {
-  "status": "healthy"
+  "status": "healthy",
+  "timestamp": "2024-01-15T12:30:45.123456",
+  "version": "1.0.0",
+  "checks": {
+    "model_loaded": true,
+    "model_type": "custom",
+    "upload_directory": true,
+    "disk_space_ok": true
+  }
 }
 ```
 
-**Status Code**: `200 OK`
+**Status Codes**:
+- `200 OK` - All critical checks passed
+- `503 Service Unavailable` - One or more critical checks failed (status: "degraded")
 
 ---
 
@@ -338,6 +358,56 @@ def classify_asl_image(image_path):
 2. Regularly rotate your SECRET_KEY
 3. Monitor the `/health` endpoint for uptime
 4. Review logs for suspicious classification requests
+
+---
+
+## Testing & CI/CD
+
+### Running Tests
+
+The project includes a comprehensive test suite using pytest:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=app --cov-report=term-missing
+
+# Run specific test file
+pytest tests/test_app.py
+```
+
+### Test Coverage
+
+Current test coverage: **69%** with 50 passing tests covering:
+- Utility functions (`allowed_file`, activation functions)
+- All Flask routes (`/`, `/docs`, `/health`, `/classify`)
+- Image preprocessing pipeline
+- Neural network forward pass
+
+### Continuous Integration
+
+GitHub Actions automatically runs on every push and pull request:
+- **Test Job**: Runs pytest with coverage
+- **Lint Job**: Checks code formatting with Black, isort, and Flake8
+
+View workflow status: Check the "Actions" tab in the GitHub repository.
+
+### Code Formatting
+
+```bash
+# Install development tools
+pip install black isort flake8
+
+# Format code
+black app.py tests/
+isort app.py tests/
+
+# Check formatting
+black --check app.py tests/
+flake8 app.py tests/
+```
 
 ---
 

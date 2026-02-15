@@ -3,9 +3,27 @@ services:
     name: signsync
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120 app:app
+    healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
       - key: PORT
         value: "10000"
+      - key: FLASK_ENV
+        value: "production"
+      - key: FLASK_DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MAX_CONTENT_LENGTH
+        value: "16777216"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: MODEL_PATH
+        value: "model/signsync_model.pkl"
+      - key: MODEL_TYPE
+        value: "custom"
+      - key: MODEL_INPUT_SIZE
+        value: "28"
