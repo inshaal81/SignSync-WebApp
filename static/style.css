@@ -286,3 +286,186 @@ body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; } /* Ch
     background-color: lightgrey;
     padding: 25px;
 }
+
+/* Processing time display */
+.processing-time {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* Notification system */
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transform: translateX(120%);
+    transition: transform 0.3s ease-out;
+    max-width: 350px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    background: #16a34a;
+}
+
+.notification-error {
+    background: #dc2626;
+}
+
+.notification-info {
+    background: #3b82f6;
+}
+
+/* Button states */
+.imgNav button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.imgNav button.loading {
+    position: relative;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .topContent {
+        padding-left: 50px;
+        padding-right: 50px;
+        padding-bottom: 80px;
+    }
+
+    .bottomContent {
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .aboutSection, .uploadInstr {
+        width: 450px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        font-size: 28px;
+        padding: 10px;
+    }
+
+    .docsBtn {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .topContent {
+        flex-direction: column;
+        align-items: center;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 40px;
+        gap: 20px;
+    }
+
+    .bottomContent {
+        flex-direction: column;
+        margin-left: 20px;
+        margin-right: 20px;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .arrow {
+        transform: rotate(90deg);
+    }
+
+    .aboutSection, .uploadInstr {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .uploadImg {
+        width: 100%;
+    }
+
+    #videoPlaceholder {
+        min-width: 280px;
+        min-height: 210px;
+    }
+
+    #videoElement, #canvasElement {
+        max-width: 100%;
+        max-height: 280px;
+    }
+
+    #imagePlaceholder {
+        min-width: 200px;
+        min-height: 150px;
+    }
+
+    #capturedImage {
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    .imgNav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .imgNav button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .classification-letter {
+        font-size: 56px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        font-size: 22px;
+    }
+
+    .docsBtn {
+        font-size: 12px;
+    }
+
+    #videoPlaceholder {
+        min-width: 240px;
+        min-height: 180px;
+    }
+
+    .text1, .text2 {
+        font-size: 14px;
+    }
+
+    .aboutSection, .uploadInstr {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .placeholderIcon {
+        font-size: 36px;
+    }
+
+    .placeholderText {
+        font-size: 12px;
+    }
+}

@@ -189,3 +189,96 @@ body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; }
     background-color: lightgrey;
     padding: 25px;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        font-size: 28px;
+        padding: 10px;
+    }
+
+    .homeBtn {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .docsContent {
+        padding: 20px 15px;
+    }
+
+    .docsContent h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .docSection {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .docSection h2 {
+        font-size: 20px;
+    }
+
+    .docSection p {
+        font-size: 14px;
+    }
+
+    .step {
+        gap: 12px;
+    }
+
+    .stepNumber {
+        min-width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .stepContent h3 {
+        font-size: 16px;
+    }
+
+    .stepContent p {
+        font-size: 13px;
+    }
+
+    .tipsList li {
+        font-size: 14px;
+        padding-left: 20px;
+    }
+
+    .alphabetGrid {
+        grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+        gap: 6px;
+    }
+
+    .alphabetGrid span {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        font-size: 22px;
+    }
+
+    .homeBtn {
+        font-size: 12px;
+    }
+
+    .docsContent h1 {
+        font-size: 24px;
+    }
+
+    .docSection h2 {
+        font-size: 18px;
+    }
+
+    .alphabetGrid span {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+}
