@@ -4,6 +4,8 @@ A real-time American Sign Language (ASL) classification web application powered 
 
 **[Live Demo](https://signsync-webapp.onrender.com)**
 
+<img src="signSync.png" />
+
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-2.3.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
