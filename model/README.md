@@ -10,7 +10,7 @@ This directory contains the machine learning model for American Sign Language (A
 **Type:** Custom neural network
 **Format:** Pickle serialized dictionary
 **Architecture:** 784 -> 128 -> 64 -> 24 (fully connected)
-**Test Accuracy:** ~77.7%
+**Test Accuracy:** 85%
 
 ## Supported Model Types
 

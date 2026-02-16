@@ -2,11 +2,13 @@
 
 A real-time American Sign Language (ASL) classification web application powered by machine learning.
 
+**[Live Demo](https://signsync-webapp.onrender.com)**
+
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-2.3.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-SignSync enables users to capture hand gestures via webcam and receive instant ASL letter predictions with confidence scores. Built with Flask and designed for easy deployment on Render.
+SignSync enables users to capture hand gestures via webcam and receive instant ASL letter predictions with confidence scores. Built with Flask and deployed on Render.
 
 ---
 
@@ -174,7 +176,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
    - Auto-deploy on push: enabled
    - Auto-generated `SECRET_KEY`
 
-Your app will be live at `https://signsync.onrender.com` (or your custom domain).
+Your app will be live at `https://signsync-webapp.onrender.com` (or your custom domain).
 
 ### Manual Configuration
 
