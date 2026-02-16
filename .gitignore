@@ -35,7 +35,6 @@ uploads/
 # Model files (add your own)
 model/*.h5
 model/*.pt
-model/*.pkl
 model/*.onnx
 
 # IDE
