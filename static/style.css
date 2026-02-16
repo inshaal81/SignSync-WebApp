@@ -206,16 +206,23 @@ body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; } /* Ch
 
 /* result display */
 .result {
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 200px;
-    min-height: 150px;
+    min-width: 250px;
+    min-height: 187.5px;
     padding: 20px;
-    border: 2px solid var(--muted);
+    border: 2px dashed var(--muted);
     border-radius: 12px;
+    background-color: var(--lightgray);
+    opacity: 0.6;
+}
+
+.result.has-result {
+    border: 2px solid var(--muted);
     background-color: var(--bg);
+    opacity: 1;
 }
 
 .classification-result {
@@ -292,39 +299,6 @@ body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; } /* Ch
     font-size: 12px;
     color: var(--muted);
     margin-top: 4px;
-}
-
-/* Notification system */
-.notification {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    padding: 16px 24px;
-    border-radius: 8px;
-    color: white;
-    font-weight: 500;
-    font-size: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    transform: translateX(120%);
-    transition: transform 0.3s ease-out;
-    max-width: 350px;
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-.notification-success {
-    background: #16a34a;
-}
-
-.notification-error {
-    background: #dc2626;
-}
-
-.notification-info {
-    background: #3b82f6;
 }
 
 /* Button states */
@@ -425,12 +399,6 @@ body::-webkit-scrollbar, body::-webkit-scrollbar-button { display: none; } /* Ch
     .imgNav button {
         font-size: 12px;
         padding: 6px 10px;
-    }
-
-    .notification {
-        right: 10px;
-        left: 10px;
-        max-width: none;
     }
 
     .classification-letter {

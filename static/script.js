@@ -12,29 +12,6 @@ const startBtn = document.querySelector('[onclick="startWebcam()"]');
 const snapshotBtn = document.querySelector('[onclick="takeSnapshot()"]');
 const stopBtn = document.querySelector('[onclick="stopWebcam()"]');
 
-// Notification system
-function showNotification(message, type = 'info') {
-    // Remove existing notification if any
-    const existing = document.querySelector('.notification');
-    if (existing) existing.remove();
-
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    // Trigger animation
-    requestAnimationFrame(() => {
-        notification.classList.add('show');
-    });
-
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 4000);
-}
-
 // Button loading state helpers
 function setButtonLoading(button, loading, originalText) {
     if (!button) return;
@@ -53,10 +30,6 @@ function setButtonLoading(button, loading, originalText) {
 // Browser compatibility check
 function checkBrowserCompatibility() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        showNotification(
-            'Your browser does not support webcam access. Please use Chrome, Firefox, or Safari.',
-            'error'
-        );
         // Disable webcam buttons
         if (startBtn) startBtn.disabled = true;
         if (snapshotBtn) snapshotBtn.disabled = true;
@@ -83,7 +56,6 @@ function startWebcam() {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 setButtonLoading(startBtn, false, 'Start Webcam');
-                showNotification('Webcam started successfully', 'success');
             };
         })
         .catch(function(err) {
@@ -99,7 +71,8 @@ function startWebcam() {
                 message = 'Camera is in use by another application.';
             }
 
-            showNotification(message, 'error');
+            resultDiv.innerHTML = `<div class="error">${message}</div>`;
+            resultDiv.classList.add('has-result');
         });
 }
 
@@ -112,7 +85,6 @@ function stopWebcam() {
         // Show placeholder and hide video
         video.style.display = 'none';
         videoPlaceholder.style.display = 'flex';
-        showNotification('Webcam stopped', 'info');
     }
 }
 
@@ -134,7 +106,8 @@ function takeSnapshot() {
         // Send image to Flask backend for classification
         sendImageForClassification(imageDataUrl);
     } else {
-        showNotification('Please start the webcam first', 'error');
+        resultDiv.innerHTML = '<div class="error">Please start the webcam first</div>';
+        resultDiv.classList.add('has-result');
     }
 }
 
@@ -144,7 +117,7 @@ async function sendImageForClassification(imageDataUrl) {
     try {
         // Show loading state
         resultDiv.innerHTML = '<div class="loading">Classifying...</div>';
-        resultDiv.style.display = 'flex';
+        resultDiv.classList.add('has-result');
 
         // Convert data URL to Blob
         const base64Data = imageDataUrl.split(',')[1];
@@ -183,7 +156,6 @@ async function sendImageForClassification(imageDataUrl) {
                     <div class="processing-time">Processed in ${processingTime}s</div>
                 </div>
             `;
-            showNotification(`Detected letter: ${result.classification}`, 'success');
         } else {
             throw new Error(result.error || 'Classification failed');
         }
@@ -191,7 +163,6 @@ async function sendImageForClassification(imageDataUrl) {
     } catch (error) {
         console.error('Error classifying image:', error);
         resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-        showNotification(`Classification failed: ${error.message}`, 'error');
     } finally {
         setButtonLoading(snapshotBtn, false, 'Take Snapshot');
     }
