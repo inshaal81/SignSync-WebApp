@@ -90,8 +90,6 @@ function stopWebcam() {
 
 function takeSnapshot() {
     if (webcamStream) {
-        setButtonLoading(snapshotBtn, true);
-
         // Draw the current video frame onto the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
@@ -103,68 +101,18 @@ function takeSnapshot() {
         imagePlaceholder.style.display = 'none';
         capturedImage.style.display = 'flex';
 
-        // Send image to Flask backend for classification
-        sendImageForClassification(imageDataUrl);
+        // Show coming soon message
+        resultDiv.innerHTML = `
+            <div class="classification-result">
+                <div class="classification-letter">Coming Soon</div>
+                <div class="confidence">MediaPipe + LSTM model in development</div>
+                <div class="processing-time">Real-time ASL recognition</div>
+            </div>
+        `;
+        resultDiv.classList.add('has-result');
     } else {
         resultDiv.innerHTML = '<div class="error">Please start the webcam first</div>';
         resultDiv.classList.add('has-result');
-    }
-}
-
-async function sendImageForClassification(imageDataUrl) {
-    const startTime = performance.now();
-
-    try {
-        // Show loading state
-        resultDiv.innerHTML = '<div class="loading">Classifying...</div>';
-        resultDiv.classList.add('has-result');
-
-        // Convert data URL to Blob
-        const base64Data = imageDataUrl.split(',')[1];
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'image/jpeg' });
-
-        // Create FormData and append the image
-        const formData = new FormData();
-        formData.append('image', blob, 'capture.jpg');
-
-        // Send to Flask backend
-        const classifyResponse = await fetch('/classify', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!classifyResponse.ok) {
-            const errorData = await classifyResponse.json().catch(() => ({}));
-            throw new Error(errorData.error || `Server error: ${classifyResponse.status}`);
-        }
-
-        const result = await classifyResponse.json();
-        const processingTime = ((performance.now() - startTime) / 1000).toFixed(2);
-
-        if (result.success) {
-            // Display classification result with processing time
-            resultDiv.innerHTML = `
-                <div class="classification-result">
-                    <div class="classification-letter">${result.classification}</div>
-                    <div class="confidence">Confidence: ${(result.confidence * 100).toFixed(1)}%</div>
-                    <div class="processing-time">Processed in ${processingTime}s</div>
-                </div>
-            `;
-        } else {
-            throw new Error(result.error || 'Classification failed');
-        }
-
-    } catch (error) {
-        console.error('Error classifying image:', error);
-        resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-    } finally {
-        setButtonLoading(snapshotBtn, false, 'Take Snapshot');
     }
 }
 
