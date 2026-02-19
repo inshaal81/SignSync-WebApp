@@ -60,7 +60,7 @@ SignSync is designed to recognize:
 |----------|----------|
 | **ASL Alphabets** | A-Z (26 letters) |
 | **Numbers** | 0-9 |
-| **Common Words** | hello, thanks, iloveyou |
+| **Common Words** | hello, thank you, I love you etc. |
 | **Simple Sentences** | Multi-sign phrases and expressions |
 
 > **Note**: The currently deployed model recognizes a subset of gestures. Additional gestures can be added by training and deploying an updated model.
