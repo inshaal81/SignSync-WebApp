@@ -457,7 +457,7 @@ pytest tests/test_app.py
 
 MIT License
 
-Copyright (c) 2024 theChosen-1
+Copyright (c) 2024 inshaal81
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -480,5 +480,5 @@ SOFTWARE.
 ---
 
 <p align="center">
-  Built with care by <a href="https://github.com/theChosen-1">theChosen-1</a>
+  Built with care by <a href="https://github.com/inshaal81">inshaal81</a>
 </p>
