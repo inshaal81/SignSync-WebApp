@@ -1,31 +1,38 @@
-# SignSync - Web App
+# SignSync
 
-A real-time American Sign Language (ASL) classification web application powered by machine learning.
+**Real-time American Sign Language Recognition in the Browser**
 
-**[Live Demo](https://signsync-webapp.onrender.com)**
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)](https://signsync-webapp.onrender.com)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![TensorFlow.js](https://img.shields.io/badge/TensorFlow.js-4.17-ff6f00?style=flat-square&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/js)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-0.10.8-00897b?style=flat-square&logo=google&logoColor=white)](https://mediapipe.dev)
+[![Flask](https://img.shields.io/badge/Flask-2.3+-000000?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![Render](https://img.shields.io/badge/Deployed%20on-Render-46e3b7?style=flat-square&logo=render&logoColor=white)](https://render.com)
 
-<img src="static/images/signSync.png" />
+SignSync is a web application that recognizes American Sign Language (ASL) gestures in real-time using your webcam. All machine learning inference runs directly in your browser - no server-side processing required.
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-2.3.0+-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+**[Try the Live Demo](https://signsync-webapp.onrender.com)**
 
-SignSync enables users to capture hand gestures via webcam and receive instant ASL letter predictions with confidence scores. Built with Flask and deployed on Render.
+<p align="center">
+  <img src="static/images/signSync.png" alt="SignSync Demo" width="600">
+</p>
 
 ---
 
 ## Table of Contents
 
 - [Features](#features)
+- [Recognition Capabilities](#recognition-capabilities)
+- [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
-- [Local Development](#local-development)
-- [Environment Variables](#environment-variables)
-- [Deployment on Render](#deployment-on-render)
-- [API Endpoints](#api-endpoints)
-- [Adding Your ML Model](#adding-your-ml-model)
-- [Security Considerations](#security-considerations)
-- [Testing & CI/CD](#testing--cicd)
+- [Model Configuration](#model-configuration)
+- [Model Training and Conversion](#model-training-and-conversion)
+- [Deployment](#deployment)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -33,61 +40,109 @@ SignSync enables users to capture hand gestures via webcam and receive instant A
 
 ## Features
 
-- **Real-time Webcam Capture** - Start, stop, and capture snapshots directly from your browser
-- **ASL Letter Classification** - Identify hand gestures for all 26 letters of the ASL alphabet
-- **Confidence Scores** - Each prediction includes a confidence percentage
-- **Interactive Documentation** - Built-in "How It Works" page explaining the technology
-- **Production-Ready** - Configured for Render deployment with Gunicorn
-- **Secure by Default** - Enforces SECRET_KEY in production, validates file uploads
-- **Automatic Cleanup** - Temporary uploaded images are deleted immediately after classification
+- **Real-time Recognition** - Instant ASL gesture detection using your webcam
+- **Browser-based Inference** - All ML processing runs locally in your browser for privacy and speed
+- **Multi-landmark Tracking** - Simultaneous pose, face, and hand tracking for comprehensive gesture analysis
+- **Visual Feedback** - Live landmark visualization overlay on video feed
+- **Confidence Scoring** - Each prediction includes a confidence percentage
+- **Swappable Models** - Easy model updates via configuration file
+- **Privacy-first** - No video data sent to servers; all processing is client-side
+- **Mobile-friendly** - Responsive design works on desktop and mobile browsers
+- **Free Tier Compatible** - Designed to run on Render's free hosting tier
+
+---
+
+## Recognition Capabilities
+
+SignSync is designed to recognize:
+
+| Category | Examples |
+|----------|----------|
+| **ASL Alphabets** | A-Z (26 letters) |
+| **Numbers** | 0-9 |
+| **Common Words** | hello, thanks, iloveyou |
+| **Simple Sentences** | Multi-sign phrases and expressions |
+
+> **Note**: The currently deployed model recognizes a subset of gestures. Additional gestures can be added by training and deploying an updated model.
+
+---
+
+## Architecture
+
+SignSync uses a client-side machine learning architecture where all inference runs in the browser:
+
+```
++------------------+     +----------------------+     +------------------+
+|     Webcam       | --> |   MediaPipe (WASM)   | --> |   TensorFlow.js  |
+|   Video Feed     |     |   Landmark Extraction |     |   LSTM Model     |
++------------------+     +----------------------+     +------------------+
+                                   |                           |
+                                   v                           v
+                         +------------------+         +------------------+
+                         |   1692 Keypoints |         |   Prediction     |
+                         |    per Frame     |         |   + Confidence   |
+                         +------------------+         +------------------+
+```
+
+### Keypoint Extraction
+
+MediaPipe extracts **1692 keypoints per frame** from three landmark models:
+
+| Model | Landmarks | Coordinates | Total Values |
+|-------|-----------|-------------|--------------|
+| **Pose** | 33 landmarks | x, y, z, visibility | 132 |
+| **Face** | 478 landmarks | x, y, z | 1434 |
+| **Left Hand** | 21 landmarks | x, y, z | 63 |
+| **Right Hand** | 21 landmarks | x, y, z | 63 |
+| **Total** | - | - | **1692** |
+
+### LSTM Processing
+
+The LSTM model processes **30-frame sequences** (approximately 1 second of video at 30fps):
+
+- **Input shape**: `[batch, 30, 1692]`
+- **Output**: Probability distribution over gesture classes
+- **Inference**: Runs on every frame once the buffer is full (sliding window)
+
+### Data Flow
+
+1. **Webcam** captures video frames at 30fps
+2. **MediaPipe** (running via WebAssembly) extracts landmarks from each frame
+3. **Buffer** accumulates 30 frames of keypoint data
+4. **TensorFlow.js** runs the LSTM model on the buffered sequence
+5. **UI** displays the predicted gesture with confidence score
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Backend** | Flask 2.3.0+, Python 3.11+ |
-| **Image Processing** | Pillow 10.0.0+ |
-| **WSGI Server** | Gunicorn 21.0.0+ |
-| **Environment** | python-dotenv 1.0.0+ |
-| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
-| **Deployment** | Render (render.yaml configured) |
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Frontend** | HTML5, CSS3, JavaScript | User interface and interaction |
+| **ML - Landmarks** | MediaPipe Vision Tasks | Pose, face, and hand landmark extraction |
+| **ML - Inference** | TensorFlow.js | LSTM model execution in browser |
+| **Backend** | Flask | Static file serving |
+| **WSGI** | Gunicorn | Production server |
+| **Deployment** | Render | Cloud hosting (free tier) |
+
+### Why This Architecture?
+
+- **Privacy**: Video never leaves the user's device
+- **Speed**: No network latency for inference
+- **Cost**: No GPU servers required; runs on free hosting
+- **Scalability**: Server load is minimal (static files only)
 
 ---
 
-## Project Structure
-
-```
-SignSync-WebApp/
-├── app.py                 # Flask application with routes and classification
-├── requirements.txt       # Python dependencies
-├── render.yaml            # Render deployment configuration
-├── .env.example           # Environment variable template
-├── .gitignore             # Git ignore rules
-├── README.md              # This file
-├── template/
-│   ├── index.html         # Main page with webcam interface
-│   └── docs.html          # "How It Works" documentation page
-├── static/
-│   ├── script.js          # Webcam capture and classification logic
-│   ├── style.css          # Main page styles
-│   └── docStyle.css       # Documentation page styles
-├── model/                 # Directory for ML model files (add your own)
-└── uploads/               # Temporary image storage (auto-cleaned)
-```
-
----
-
-## Local Development
+## Getting Started
 
 ### Prerequisites
 
 - Python 3.11 or higher
-- pip (Python package manager)
-- A modern web browser with webcam support
+- A modern web browser (Chrome, Firefox, Edge, Safari)
+- Webcam access
 
-### Setup
+### Installation
 
 1. **Clone the repository**
 
@@ -96,7 +151,7 @@ SignSync-WebApp/
    cd SignSync-WebApp
    ```
 
-2. **Create and activate a virtual environment**
+2. **Create a virtual environment**
 
    ```bash
    python -m venv venv
@@ -109,11 +164,10 @@ SignSync-WebApp/
    pip install -r requirements.txt
    ```
 
-4. **Set up environment variables**
+4. **Set up environment variables** (optional for development)
 
    ```bash
    cp .env.example .env
-   # Edit .env with your preferred settings (optional for development)
    ```
 
 5. **Run the development server**
@@ -126,250 +180,213 @@ SignSync-WebApp/
 
    Navigate to [http://localhost:5001](http://localhost:5001)
 
+### Quick Start
+
+1. Click the **Start** button to enable your webcam
+2. Position yourself so your upper body is visible
+3. Perform ASL gestures
+4. View real-time predictions with confidence scores
+
 ---
 
-## Environment Variables
+## Project Structure
 
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `SECRET_KEY` | Flask secret key for session security | Yes (production) | `dev-only-not-for-production` |
-| `FLASK_DEBUG` | Enable debug mode (`True`/`False`) | No | `False` |
-| `FLASK_ENV` | Environment (`development`/`production`) | No | Inferred from DEBUG |
-| `PORT` | Server port number | No | `5001` (local), `10000` (Render) |
-| `MODEL_PATH` | Path to ML model file | No | `model/signsync_model.pkl` |
-| `MODEL_TYPE` | Model type (`custom`/`sklearn`/`tensorflow`/`onnx`) | No | `custom` |
-| `MODEL_INPUT_SIZE` | Expected input image size (pixels) | No | `28` |
-| `MAX_CONTENT_LENGTH` | Max upload size in bytes | No | `16777216` (16MB) |
-| `LOG_LEVEL` | Logging level | No | `INFO` |
-
-### Generating a SECRET_KEY
-
-For production, generate a secure secret key:
-
-```bash
-python -c "import secrets; print(secrets.token_hex(32))"
+```
+SignSync-WebApp/
+├── app.py                      # Flask application (routes only)
+├── requirements.txt            # Python dependencies
+├── render.yaml                 # Render deployment configuration
+├── convert_model.py            # Keras to TensorFlow.js converter
+├── .env.example                # Environment variable template
+│
+├── template/
+│   ├── index.html              # Main application page
+│   └── docs.html               # "How It Works" documentation
+│
+├── static/
+│   ├── script.js               # MediaPipe + TensorFlow.js integration
+│   ├── style.css               # Main application styles
+│   ├── docStyle.css            # Documentation page styles
+│   ├── model_config.json       # Model configuration and labels
+│   ├── images/                 # Static images
+│   └── tfjs_model/             # TensorFlow.js model files
+│       ├── model.json          # Model architecture
+│       └── group1-shard*.bin   # Model weights
+│
+├── tests/                      # Test suite
+│   └── test_app.py             # Flask route tests
+│
+└── gesture_model.keras         # Source Keras model (for conversion)
 ```
 
 ---
 
-## Deployment on Render
+## Model Configuration
 
-### Automatic Deployment
+The model behavior is controlled by `static/model_config.json`:
 
-1. **Push your code to GitHub**
+```json
+{
+    "labels": ["hello", "thanks", "iloveyou"],
+    "sequenceLength": 30,
+    "keypointSize": 1692,
+    "confidenceThreshold": 0.7,
+    "version": "1.0.0",
+    "description": "LSTM model for ASL gesture recognition",
+    "keypointBreakdown": {
+        "pose": 132,
+        "face": 1434,
+        "leftHand": 63,
+        "rightHand": 63,
+        "total": 1692
+    }
+}
+```
+
+### Configuration Options
+
+| Field | Description |
+|-------|-------------|
+| `labels` | Array of gesture class names (in order of model output) |
+| `sequenceLength` | Number of frames to buffer before inference |
+| `keypointSize` | Total keypoints per frame (must match model input) |
+| `confidenceThreshold` | Minimum confidence for high-confidence display (0-1) |
+
+### Swapping Models
+
+To use a different model:
+
+1. Convert your Keras model to TensorFlow.js format (see below)
+2. Replace files in `static/tfjs_model/`
+3. Update `static/model_config.json` with new labels
+4. Deploy or restart the application
+
+---
+
+## Model Training and Conversion
+
+### Training Data Format
+
+The model expects input sequences with shape `[batch, 30, 1692]`:
+
+- **30 frames** of sequential landmark data
+- **1692 features** per frame (pose + face + hands)
+- Features must be normalized (0-1 range from MediaPipe)
+
+### Converting Keras to TensorFlow.js
+
+Use the provided conversion script:
+
+```bash
+# Create a separate environment (requires Python 3.10 or 3.11)
+python3.11 -m venv tfjs_env
+source tfjs_env/bin/activate
+
+# Install conversion dependencies
+pip install tensorflow==2.15.0 tensorflowjs==4.17.0
+
+# Run conversion
+python convert_model.py
+```
+
+Alternatively, use Docker:
+
+```bash
+docker run -it --rm -v $(pwd):/app -w /app python:3.11-slim bash -c "
+    pip install tensorflow==2.15.0 tensorflowjs==4.17.0 &&
+    python convert_model.py
+"
+```
+
+The script will:
+1. Load `gesture_model.keras`
+2. Convert to TensorFlow.js LayersModel format
+3. Save to `static/tfjs_model/`
+
+### Model Requirements
+
+Your Keras model should:
+- Accept input shape `(None, 30, 1692)`
+- Output a probability distribution over gesture classes
+- Use layers supported by TensorFlow.js (LSTM, Dense, Dropout, etc.)
+
+---
+
+## Deployment
+
+### Deploy to Render
+
+1. **Fork or push to GitHub**
 
 2. **Create a new Web Service on [Render](https://render.com)**
 
-3. **Connect your GitHub repository**
+3. **Connect your repository**
 
-4. **Configure environment variables**
-
-   In Render's dashboard, add:
-   - `SECRET_KEY`: Your generated secret key (required)
-   - `FLASK_DEBUG`: `False` (recommended for production)
-
-5. **Deploy**
-
-   Render will automatically detect `render.yaml` and configure:
+4. **Render auto-detects `render.yaml`** and configures:
    - Python 3.11 runtime
-   - Build command: `pip install -r requirements.txt`
-   - Start command: `gunicorn --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120 app:app`
-   - Health check path: `/health`
-   - Auto-deploy on push: enabled
-   - Auto-generated `SECRET_KEY`
+   - Build: `pip install -r requirements.txt`
+   - Start: `gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 app:app`
+   - Health check: `/health`
+   - Auto-deploy on push
 
-Your app will be live at `https://signsync-webapp.onrender.com` (or your custom domain).
+5. **Your app will be live** at `https://your-app.onrender.com`
 
-### Manual Configuration
+### Environment Variables
 
-If not using `render.yaml`, configure these settings manually:
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `SECRET_KEY` | Flask secret key | Yes (auto-generated on Render) |
+| `FLASK_DEBUG` | Enable debug mode | No (default: False) |
+| `PORT` | Server port | No (default: 10000 on Render) |
 
-- **Runtime**: Python 3.11
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:app`
+### Free Tier Considerations
 
----
-
-## API Endpoints
-
-### GET `/`
-
-Returns the main page with webcam interface.
-
-**Response**: HTML page
+SignSync is optimized for Render's free tier:
+- **Minimal server load**: Flask only serves static files
+- **No GPU required**: All ML runs in browser
+- **Small footprint**: ~50MB total deployment size
+- **Cold starts**: First request may take 30-60 seconds to spin up
 
 ---
 
-### GET `/docs`
+## API Reference
 
-Returns the "How It Works" documentation page.
+### Routes
 
-**Response**: HTML page
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Main application page |
+| GET | `/docs` | "How It Works" documentation |
+| GET | `/health` | Health check endpoint |
 
----
+### Health Check Response
 
-### GET `/health`
-
-Health check endpoint for monitoring and deployment verification.
-
-**Response**:
 ```json
 {
   "status": "healthy",
   "timestamp": "2024-01-15T12:30:45.123456",
-  "version": "1.0.0",
-  "checks": {
-    "model_loaded": true,
-    "model_type": "custom",
-    "upload_directory": true,
-    "disk_space_ok": true
-  }
+  "version": "2.0.0",
+  "message": "Frontend ready - ML model coming soon"
 }
 ```
 
-**Status Codes**:
-- `200 OK` - All critical checks passed
-- `503 Service Unavailable` - One or more critical checks failed (status: "degraded")
-
 ---
 
-### POST `/classify`
+## Contributing
 
-Classifies an ASL hand gesture from an uploaded image.
+Contributions are welcome! Here's how to get started:
 
-**Request**:
-- Content-Type: `multipart/form-data`
-- Body: `image` (file) - Image file (PNG, JPG, JPEG, or GIF)
+### Development Setup
 
-**Successful Response** (200):
-```json
-{
-  "success": true,
-  "classification": "A",
-  "confidence": 0.95
-}
-```
-
-**Error Responses**:
-
-| Status | Response | Cause |
-|--------|----------|-------|
-| 400 | `{"error": "No image file provided"}` | Missing `image` field |
-| 400 | `{"error": "No file selected"}` | Empty filename |
-| 400 | `{"error": "Invalid file type. Only images are allowed."}` | Unsupported file extension |
-| 500 | `{"error": "Classification error: ..."}` | Model/processing failure |
-| 500 | `{"error": "Server error: ..."}` | General server error |
-
-**Example using curl**:
-
-```bash
-curl -X POST -F "image=@hand_sign.jpg" http://localhost:5001/classify
-```
-
----
-
-## Adding Your ML Model
-
-The application includes placeholder classification that returns random letters. To integrate your trained ASL model:
-
-### Step 1: Add Your Model File
-
-Place your trained model in the `model/` directory:
-
-```
-model/
-├── asl_model.h5      # TensorFlow/Keras
-├── asl_model.pt      # PyTorch
-└── asl_model.pkl     # Scikit-learn
-```
-
-### Step 2: Update Dependencies
-
-Add your ML framework to `requirements.txt`:
-
-```
-# For TensorFlow
-tensorflow>=2.13.0
-
-# For PyTorch
-torch>=2.0.0
-torchvision>=0.15.0
-
-# For Scikit-learn
-scikit-learn>=1.3.0
-```
-
-### Step 3: Modify app.py
-
-Update the model loading and classification function:
-
-```python
-# MODEL LOADING
-# Replace this section in app.py
-
-import tensorflow as tf  # or import torch
-
-# Load your model
-MODEL = tf.keras.models.load_model('model/asl_model.h5')
-
-def classify_asl_image(image_path):
-    """
-    ASL classification function.
-    """
-    from PIL import Image
-    import numpy as np
-
-    # Load and preprocess image
-    img = Image.open(image_path).convert('RGB')
-    img = img.resize((224, 224))  # Adjust to your model's input size
-    img_array = np.array(img) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-
-    # Run prediction
-    predictions = MODEL.predict(img_array)
-    predicted_index = np.argmax(predictions[0])
-    confidence = float(predictions[0][predicted_index])
-
-    # Map index to letter
-    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    classification = letters[predicted_index]
-
-    return classification, confidence
-```
-
----
-
-## Security Considerations
-
-### Production Requirements
-
-- **SECRET_KEY**: The application will raise an error if `SECRET_KEY` is not set in production mode. Never use the default development key in production.
-
-### File Upload Security
-
-- **Allowed Extensions**: Only `png`, `jpg`, `jpeg`, and `gif` files are accepted
-- **File Size Limit**: Maximum upload size is 16MB
-- **Automatic Cleanup**: Uploaded files are deleted immediately after classification
-
-### Debug Mode
-
-- Set `FLASK_DEBUG=False` in production
-- Debug mode exposes detailed error messages that could reveal sensitive information
-
-### Recommendations
-
-1. Always use HTTPS in production (Render provides this automatically)
-2. Regularly rotate your SECRET_KEY
-3. Monitor the `/health` endpoint for uptime
-4. Review logs for suspicious classification requests
-
----
-
-## Testing & CI/CD
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Run tests: `pytest`
+5. Commit: `git commit -m 'Add amazing feature'`
+6. Push: `git push origin feature/amazing-feature`
+7. Open a Pull Request
 
 ### Running Tests
-
-The project includes a comprehensive test suite using pytest:
 
 ```bash
 # Run all tests
@@ -382,66 +399,57 @@ pytest --cov=app --cov-report=term-missing
 pytest tests/test_app.py
 ```
 
-### Test Coverage
+### Code Style
 
-Current test coverage: **69%** with 50 passing tests covering:
-- Utility functions (`allowed_file`, activation functions)
-- All Flask routes (`/`, `/docs`, `/health`, `/classify`)
-- Image preprocessing pipeline
-- Neural network forward pass
+- Python: Follow PEP 8
+- JavaScript: Use consistent formatting (4-space indentation)
+- CSS: Use BEM-style class naming
 
-### Continuous Integration
+### Areas for Contribution
 
-GitHub Actions automatically runs on every push and pull request:
-- **Test Job**: Runs pytest with coverage
-- **Lint Job**: Checks code formatting with Black, isort, and Flake8
-
-View workflow status: Check the "Actions" tab in the GitHub repository.
-
-### Code Formatting
-
-```bash
-# Install development tools
-pip install black isort flake8
-
-# Format code
-black app.py tests/
-isort app.py tests/
-
-# Check formatting
-black --check app.py tests/
-flake8 app.py tests/
-```
+- Add support for more ASL gestures
+- Improve model accuracy
+- Add mobile-specific optimizations
+- Create training data collection tools
+- Write documentation or tutorials
+- Report and fix bugs
 
 ---
 
 ## Troubleshooting
 
-### Webcam Not Working
+### Camera Not Working
 
-- **Browser Permissions**: Ensure you've granted camera access when prompted
-- **HTTPS Required**: Some browsers require HTTPS for webcam access (not an issue on localhost)
-- **Device Availability**: Check if another application is using the camera
+| Issue | Solution |
+|-------|----------|
+| Permission denied | Click the camera icon in browser address bar and allow access |
+| No camera found | Connect a webcam and refresh the page |
+| Camera in use | Close other applications using the camera |
+| HTTPS required | Use localhost or deploy with HTTPS |
 
-### Classification Errors
+### Model Not Loading
 
-- **Image Quality**: Ensure good lighting and a plain background
-- **Hand Position**: Keep your entire hand visible in frame
-- **File Size**: Images larger than 16MB will be rejected
+| Issue | Solution |
+|-------|----------|
+| 404 on model files | Ensure `static/tfjs_model/model.json` exists |
+| Tensor shape mismatch | Verify `model_config.json` matches model architecture |
+| WebGL errors | Try a different browser or disable GPU acceleration |
+
+### Poor Recognition Accuracy
+
+| Issue | Solution |
+|-------|----------|
+| Low confidence scores | Ensure good lighting and plain background |
+| Incorrect predictions | Keep entire upper body in frame |
+| Delayed predictions | Wait for buffer to fill (30 frames) |
 
 ### Deployment Issues
 
-- **SECRET_KEY Missing**: Add `SECRET_KEY` environment variable in Render dashboard
-- **Build Failures**: Check that `requirements.txt` is properly formatted
-- **Port Binding**: Ensure no other service is using port 10000 on Render
-
-### Development Mode
-
-To enable detailed error messages locally:
-
-```bash
-FLASK_DEBUG=True python app.py
-```
+| Issue | Solution |
+|-------|----------|
+| Build fails | Check `requirements.txt` for syntax errors |
+| App crashes on start | Verify `SECRET_KEY` is set in production |
+| Slow initial load | Normal on free tier (cold start); wait 30-60 seconds |
 
 ---
 
@@ -468,3 +476,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+<p align="center">
+  Built with care by <a href="https://github.com/theChosen-1">theChosen-1</a>
+</p>
